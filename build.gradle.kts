@@ -26,7 +26,7 @@ description = "A builder-style user interface library."
 subprojects {
     apply<IndraPlugin>()
     apply<IndraCheckstylePlugin>()
-    apply<SpotlessPlugin>()
+//    apply<SpotlessPlugin>()
 
     // Don't publish examples
     if (!name.startsWith("example-")) {
@@ -37,6 +37,7 @@ subprojects {
         mavenCentral()
         sonatypeSnapshots()
         maven("https://papermc.io/repo/repository/maven-public/")
+        maven("https://jitpack.io")
     }
 
     dependencies {
@@ -67,15 +68,15 @@ subprojects {
         }
     }
 
-    configure<SpotlessExtension> {
-        kotlin {
-            ktlint("0.47.1")
-        }
-    }
+//    configure<SpotlessExtension> {
+//        kotlin {
+//            ktlint("0.47.1")
+//        }
+//    }
 
     // Configure any existing RunServerTasks
     tasks.withType<RunServerTask> {
-        minecraftVersion("1.19.4")
+        minecraftVersion("1.20.1")
         jvmArgs("-Dio.papermc.paper.suppress.sout.nags=true")
     }
 }

@@ -4,7 +4,7 @@ plugins {
 
 rootProject.name = "interfaces"
 
-interfacesProjects("core", "kotlin", "paper", "next")
+interfacesProjects("core", "kotlin", "paper", "next", "minestom")
 
 fun interfacesProjects(vararg names: String) {
     include(*names)
@@ -21,5 +21,7 @@ fun interfacesProjects(vararg names: String) {
 //project(":examples/example-kotlin").name = "example-kotlin"
 include("examples/example-next")
 project(":examples/example-next").name = "example-next"
+include("examples/example-minestom")
+project(":examples/example-minestom").name = "example-minestom"
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
