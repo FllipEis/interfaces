@@ -26,7 +26,7 @@ description = "A builder-style user interface library."
 subprojects {
     apply<IndraPlugin>()
     apply<IndraCheckstylePlugin>()
-//    apply<SpotlessPlugin>()
+    apply<SpotlessPlugin>()
 
     // Don't publish examples
     if (!name.startsWith("example-")) {
@@ -68,11 +68,11 @@ subprojects {
         }
     }
 
-//    configure<SpotlessExtension> {
-//        kotlin {
-//            ktlint("0.47.1")
-//        }
-//    }
+    configure<SpotlessExtension> {
+        kotlin {
+            ktlint("0.47.1")
+        }
+    }
 
     // Configure any existing RunServerTasks
     tasks.withType<RunServerTask> {
