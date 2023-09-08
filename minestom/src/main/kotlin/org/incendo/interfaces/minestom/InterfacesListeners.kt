@@ -163,7 +163,7 @@ public class InterfacesListeners private constructor() {
         val view = getOpenPlayerInterface(player.uuid) as? AbstractInterfaceView<*, *> ?: return
 
         val slot = player.heldSlot.toInt()
-        val clickedPoint = GridPoint.at(2, slot)
+        val clickedPoint = GridPoint.at(3, slot)
 
         //TODO: sneak is not implemented
         handleClick(view, clickedPoint, clickType, event)
