@@ -21,17 +21,19 @@ public abstract class PagedTransformation<P : Pane>(
     protected var page: Int by boundPage
 
     override suspend fun invoke(pane: P, view: InterfaceView) {
-        if (boundPage.hasPreceeding()) {
-            applyButton(pane, back)
-        }
-
-        if (boundPage.hasSucceeding()) {
-            applyButton(pane, forward)
-        }
+        applyButton(pane, back, !boundPage.hasPreceeding())
+        applyButton(pane, forward, !boundPage.hasSucceeding())
     }
 
-    protected open fun applyButton(pane: Pane, button: PaginationButton) {
+    protected open fun applyButton(pane: Pane, button: PaginationButton, displayFallback: Boolean) {
         val (point, drawable, increments) = button
+
+        if (displayFallback) {
+            button.fallbackDrawable?.let {
+                pane[point] = StaticElement(it) { (player, _, _) -> button.fallbackClickHandler.invoke(player) }
+            }
+            return
+        }
 
         pane[point] = StaticElement(drawable) { (player, _, click) ->
             increments[click]?.let { increment -> page += increment }
@@ -46,5 +48,7 @@ public data class PaginationButton(
     public val position: GridPoint,
     public val drawable: Drawable,
     public val increments: Map<ClickType, Int>,
-    public val clickHandler: (Player) -> Unit = {}
+    public val clickHandler: (Player) -> Unit = {},
+    public val fallbackDrawable: Drawable? = null,
+    public val fallbackClickHandler: (Player) -> Unit = {}
 )
