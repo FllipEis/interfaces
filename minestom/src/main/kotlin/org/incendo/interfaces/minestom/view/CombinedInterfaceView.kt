@@ -2,7 +2,6 @@ package org.incendo.interfaces.minestom.view
 
 import net.kyori.adventure.text.Component
 import net.minestom.server.entity.Player
-import net.minestom.server.inventory.Inventory
 import org.incendo.interfaces.minestom.InterfacesListeners
 import org.incendo.interfaces.minestom.interfaces.CombinedInterface
 import org.incendo.interfaces.minestom.inventory.CombinedInterfacesInventory
@@ -32,12 +31,8 @@ public class CombinedInterfaceView internal constructor(
     )
 
     override fun openInventory() {
-        // Close whatever inventory the player has open so they can look at their normal inventory!
-        // This will only continue if the menu hasn't been closed yet.
-        if (!isOpen(player)) {
-            player.openInventory(this.currentInventory.chestInventory)
-            InterfacesListeners.INSTANCE.setOpenInterface(player.uuid, this)
-        }
+        player.openInventory(this.currentInventory.chestInventory)
+        InterfacesListeners.INSTANCE.setOpenInterface(player.uuid, this)
     }
 
     override fun close() {
@@ -55,6 +50,6 @@ public class CombinedInterfaceView internal constructor(
     override fun overlapsPlayerInventory(): Boolean = true
 
     override fun isOpen(player: Player): Boolean {
-        return player.openInventory?.viewers?.contains(player)?: false
+        return player.openInventory?.viewers?.contains(player) ?: false
     }
 }

@@ -17,7 +17,6 @@ import org.incendo.interfaces.minestom.click.ClickContext
 import org.incendo.interfaces.minestom.click.ClickHandler
 import org.incendo.interfaces.minestom.click.CompletableClickHandler
 import org.incendo.interfaces.minestom.grid.GridPoint
-import org.incendo.interfaces.minestom.pane.PlayerPane
 import org.incendo.interfaces.minestom.view.AbstractInterfaceView
 import org.incendo.interfaces.minestom.view.PlayerInterfaceView
 import java.util.*
@@ -38,8 +37,20 @@ public class InterfacesListeners private constructor() {
                 .addListener(InventoryCloseEvent::class.java) { INSTANCE.onClose(it) }
                 .addListener(InventoryPreClickEvent::class.java) { INSTANCE.onClick(it) }
                 .addListener(PlayerDisconnectEvent::class.java) { INSTANCE.onPlayerQuit(it) }
-                .addListener(PlayerUseItemEvent::class.java) { INSTANCE.onInteract(it.player, ClickType.RIGHT_CLICK, it) }
-                .addListener(PlayerUseItemOnBlockEvent::class.java) { INSTANCE.onInteract(it.player, ClickType.RIGHT_CLICK, null) }
+                .addListener(PlayerUseItemEvent::class.java) {
+                    INSTANCE.onInteract(
+                        it.player,
+                        ClickType.RIGHT_CLICK,
+                        it
+                    )
+                }
+                .addListener(PlayerUseItemOnBlockEvent::class.java) {
+                    INSTANCE.onInteract(
+                        it.player,
+                        ClickType.RIGHT_CLICK,
+                        null
+                    )
+                }
 //                .addListener(EntityAttackEvent::class.java) { INSTANCE.onInteract(it.player, ClickType.RIGHT_CLICK, null) }
             //TODO: add left click
         }
@@ -68,7 +79,7 @@ public class InterfacesListeners private constructor() {
         openPlayerInterfaceViews.getIfPresent(playerId)
 
     /** Updates the currently open interface for [playerId] to [view]. */
-    public fun setOpenInterfaceInterface(playerId: UUID, view: PlayerInterfaceView?) {
+    public fun setOpenPlayerInterfaceInterface(playerId: UUID, view: PlayerInterfaceView?) {
         if (view == null) {
             openPlayerInterfaceViews.invalidate(playerId)
         } else {
@@ -108,34 +119,31 @@ public class InterfacesListeners private constructor() {
     }
 
     public fun onClick(event: InventoryPreClickEvent) {
-        println("click")
         val view = getOpenInterface(event.player.uuid) ?: return
-        println("view")
 
-        val clickedPoint = clickedPoint(event) ?: return
-        println("point")
+        val clickedPoint = clickedPoint(view, event) ?: return
 
         handleClick(view, clickedPoint, event.clickType, event)
     }
 
     public fun onPlayerQuit(event: PlayerDisconnectEvent) {
-        setOpenInterfaceInterface(event.player.uuid, null)
+        setOpenPlayerInterfaceInterface(event.player.uuid, null)
+        setOpenInterface(event.player.uuid, null)
     }
 
-    private fun clickedPoint(event: InventoryPreClickEvent): GridPoint? {
+    private fun clickedPoint(view: AbstractInterfaceView<*, *>, event: InventoryPreClickEvent): GridPoint? {
         // not really sure why this special handling is required,
         // the ordered pane system should solve this but this is the only
         // place where it's become an issue.
-        if (event.inventory?.viewers?.any { it is Player } ?: false) {
+        if (event.inventory == event.player.inventory || event.inventory == null) {
             val index = event.slot
 
             if (index !in PLAYER_INVENTORY_RANGE) {
                 return null
             }
 
-            val x = index / 9
-            val adjustedX = PlayerPane.PANE_ORDERING.indexOf(x)
-            return GridPoint(adjustedX, index % 9)
+            val x = view.backing.rows - 1 + index / 9
+            return GridPoint(x, index % 9)
         }
 
         val index = event.slot
@@ -155,7 +163,7 @@ public class InterfacesListeners private constructor() {
         val view = getOpenPlayerInterface(player.uuid) as? AbstractInterfaceView<*, *> ?: return
 
         val slot = player.heldSlot.toInt()
-        val clickedPoint = GridPoint.at(3, slot)
+        val clickedPoint = GridPoint.at(2, slot)
 
         //TODO: sneak is not implemented
         handleClick(view, clickedPoint, clickType, event)
@@ -167,13 +175,11 @@ public class InterfacesListeners private constructor() {
         click: ClickType,
         event: CancellableEvent?
     ) {
-        println("handle click")
         if (view.isProcessingClick || shouldThrottle(view.player)) {
             event?.isCancelled = true
             return
         }
 
-        println("not throttled")
         view.isProcessingClick = true
 
         val clickContext = ClickContext(view.player, view, click)
@@ -181,7 +187,9 @@ public class InterfacesListeners private constructor() {
         view.backing.clickPreprocessors
             .forEach { handler -> ClickHandler.process(handler, clickContext) }
 
-        val clickHandler = view.pane.getRaw(clickedPoint)
+        val raw = view.pane.getRaw(clickedPoint)
+
+        val clickHandler = raw
             ?.clickHandler ?: ClickHandler.ALLOW
 
         val completedClickHandler = clickHandler

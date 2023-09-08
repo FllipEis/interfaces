@@ -34,9 +34,9 @@ public class PlayerInterfaceView internal constructor(
         // This will only continue if the menu hasn't been closed yet.
         if (!isOpen(player)) {
             // First we close then we set the interface so we don't double open!
-            InterfacesListeners.INSTANCE.setOpenInterfaceInterface(player.uuid, null)
+            InterfacesListeners.INSTANCE.setOpenPlayerInterfaceInterface(player.uuid, null)
             player.closeInventory()
-            InterfacesListeners.INSTANCE.setOpenInterfaceInterface(player.uuid, this)
+            InterfacesListeners.INSTANCE.setOpenPlayerInterfaceInterface(player.uuid, this)
         }
     }
 
@@ -44,7 +44,7 @@ public class PlayerInterfaceView internal constructor(
         // Ensure we update the interface state in the main thread!
         // Even if the menu is not currently on the screen.
         runSync {
-            InterfacesListeners.INSTANCE.setOpenInterfaceInterface(player.uuid, null)
+            InterfacesListeners.INSTANCE.setOpenPlayerInterfaceInterface(player.uuid, null)
         }
     }
 

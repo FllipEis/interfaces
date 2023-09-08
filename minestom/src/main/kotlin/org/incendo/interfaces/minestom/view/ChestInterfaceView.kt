@@ -30,12 +30,8 @@ public class ChestInterfaceView internal constructor(
     )
 
     override fun openInventory() {
-        // Close whatever inventory the player has open so they can look at their normal inventory!
-        // This will only continue if the menu hasn't been closed yet.
-        if (!isOpen(player)) {
-            player.openInventory(this.currentInventory.chestInventory)
-            InterfacesListeners.INSTANCE.setOpenInterface(player.uuid, this)
-        }
+        player.openInventory(this.currentInventory.chestInventory)
+        InterfacesListeners.INSTANCE.setOpenInterface(player.uuid, this)
     }
 
     override fun close() {
@@ -51,6 +47,6 @@ public class ChestInterfaceView internal constructor(
     override fun requiresNewInventory(): Boolean = titleState.hasChanged
 
     override fun isOpen(player: Player): Boolean {
-        return player.openInventory?.viewers?.contains(player)?: false
+        return player.openInventory?.viewers?.contains(player) ?: false
     }
 }
