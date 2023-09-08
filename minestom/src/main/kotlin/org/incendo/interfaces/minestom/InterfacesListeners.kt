@@ -119,7 +119,7 @@ public class InterfacesListeners private constructor() {
     }
 
     public fun onClick(event: InventoryPreClickEvent) {
-        val view = getOpenInterface(event.player.uuid) ?: return
+        val view = getOpenInterface(event.player.uuid) ?: getOpenPlayerInterface(event.player.uuid) ?: return
 
         val clickedPoint = clickedPoint(view, event) ?: return
 
