@@ -19,7 +19,7 @@ plugins {
 //    id("com.diffplug.spotless") version "6.21.0"
 }
 
-group = "org.incendo.interfaces"
+group = "dev.fllip.interfaces"
 version = "1.0.0-SNAPSHOT"
 description = "A builder-style user interface library."
 
