@@ -1,6 +1,6 @@
-//import com.diffplug.gradle.spotless.SpotlessExtension
-//import com.diffplug.gradle.spotless.SpotlessPlugin
-//import com.diffplug.gradle.spotless.SpotlessTask
+import com.diffplug.gradle.spotless.SpotlessExtension
+import com.diffplug.gradle.spotless.SpotlessPlugin
+import com.diffplug.gradle.spotless.SpotlessTask
 import net.kyori.indra.IndraCheckstylePlugin
 import net.kyori.indra.IndraPlugin
 import net.kyori.indra.IndraPublishingPlugin
@@ -16,7 +16,7 @@ plugins {
 
     // Kotlin plugin prefers to be applied to parent when it's used in multiple sub-modules.
     kotlin("jvm") version "1.8.21" apply false
-//    id("com.diffplug.spotless") version "6.21.0"
+    id("com.diffplug.spotless") version "6.21.0"
 }
 
 group = "org.incendo.interfaces"
@@ -26,7 +26,7 @@ description = "A builder-style user interface library."
 subprojects {
     apply<IndraPlugin>()
     apply<IndraCheckstylePlugin>()
-//    apply<SpotlessPlugin>()
+    apply<SpotlessPlugin>()
 
     // Don't publish examples
     if (!name.startsWith("example-")) {
@@ -52,7 +52,7 @@ subprojects {
             target(17)
         }
 
-        github("incendo", "interfaces") {
+        github("FllipEis", "interfaces") {
             ci(true)
         }
 
@@ -65,14 +65,25 @@ subprojects {
                     }
                 }
             }
+
+            repositories {
+                maven {
+                    name = "GitHubPackages"
+                    url = uri("https://maven.pkg.github.com/FllipEis/interfaces")
+                    credentials {
+                        username = System.getenv("GITHUB_ACTOR")
+                        password = System.getenv("GITHUB_TOKEN")
+                    }
+                }
+            }
         }
     }
 
-//    configure<SpotlessExtension> {
-//        kotlin {
-//            ktlint("0.47.1")
-//        }
-//    }
+    configure<SpotlessExtension> {
+        kotlin {
+            ktlint("0.47.1")
+        }
+    }
 
     // Configure any existing RunServerTasks
     tasks.withType<RunServerTask> {
