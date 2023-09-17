@@ -26,11 +26,11 @@ description = "A builder-style user interface library."
 subprojects {
     apply<IndraPlugin>()
     apply<IndraCheckstylePlugin>()
-    apply<SpotlessPlugin>()
 
     // Don't publish examples
     if (!name.startsWith("example-")) {
         apply<IndraPublishingPlugin>()
+        apply<SpotlessPlugin>()
     }
 
     repositories {
