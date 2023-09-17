@@ -60,8 +60,8 @@ subprojects {
             pom {
                 developers {
                     developer {
-                        id.set("kadenscott")
-                        email.set("kscottdev@gmail.com")
+                        id.set("FllipEis")
+                        email.set("p.eistrach@gmail.com")
                     }
                 }
             }
