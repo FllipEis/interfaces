@@ -6,17 +6,17 @@ plugins {
 
 tasks {
     compileKotlin {
-        kotlinOptions.jvmTarget = "11"
+        kotlinOptions.jvmTarget = "17"
     }
 
     compileTestKotlin {
-        kotlinOptions.jvmTarget = "11"
+        kotlinOptions.jvmTarget = "17"
     }
 }
 
-ktlint {
-    version.set("0.42.1")
-}
+//ktlint {
+//    version.set("0.42.1")
+//}
 
 kotlin {
     explicitApi()
