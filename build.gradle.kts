@@ -4,7 +4,7 @@
 import net.kyori.indra.IndraCheckstylePlugin
 import net.kyori.indra.IndraPlugin
 import net.kyori.indra.IndraPublishingPlugin
-import net.kyori.indra.repository.sonatypeSnapshots
+import net.kyori.indra.sonatype.IndraSonatypePublishingPlugin
 import xyz.jpenilla.runpaper.task.RunServerTask
 
 plugins {
@@ -23,6 +23,11 @@ group = "dev.fllip.interfaces"
 version = "1.0.0-SNAPSHOT"
 description = "A builder-style user interface library."
 
+indraSonatype {
+    useAlternateSonatypeOSSHost("s01")
+}
+
+
 subprojects {
     apply<IndraPlugin>()
     apply<IndraCheckstylePlugin>()
@@ -35,7 +40,6 @@ subprojects {
 
     repositories {
         mavenCentral()
-        sonatypeSnapshots()
         maven("https://papermc.io/repo/repository/maven-public/")
         maven("https://jitpack.io")
     }
@@ -64,12 +68,9 @@ subprojects {
                         email.set("p.eistrach@gmail.com")
                     }
                 }
+
             }
         }
-    }
-
-    indraSonatype {
-        useAlternateSonatypeOSSHost("s01")
     }
 
 //    configure<SpotlessExtension> {
