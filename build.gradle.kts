@@ -16,7 +16,7 @@ plugins {
 
     // Kotlin plugin prefers to be applied to parent when it's used in multiple sub-modules.
     kotlin("jvm") version "1.8.21" apply false
-    id("com.diffplug.spotless") version "6.18.0"
+    id("com.diffplug.spotless") version "6.21.0"
 }
 
 group = "org.incendo.interfaces"
