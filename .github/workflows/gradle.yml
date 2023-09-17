@@ -1,7 +1,7 @@
 name: Build Interfaces
 on:
   push:
-    branches: "*"
+    branches: ["*"]
     tags-ignore: [ "*" ]
   pull_request:
   release:
