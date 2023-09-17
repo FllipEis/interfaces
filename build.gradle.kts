@@ -68,6 +68,10 @@ subprojects {
         }
     }
 
+    indraSonatype {
+        useAlternateSonatypeOSSHost("s01")
+    }
+
 //    configure<SpotlessExtension> {
 //        kotlin {
 //            ktlint("0.47.1")
