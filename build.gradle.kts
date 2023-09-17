@@ -20,7 +20,7 @@ plugins {
 }
 
 group = "dev.fllip.interfaces"
-version = "1.0.0-SNAPSHOT"
+version = "0.0.0"
 description = "A builder-style user interface library."
 
 indraSonatype {
