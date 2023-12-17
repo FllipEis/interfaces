@@ -19,4 +19,6 @@ public class PlayerInterfacesInventory(
         val index = gridPointToBukkitIndex(row, column)
         return playerInventory.setItem(index, item)
     }
+
+    override fun isPlayerInventory(row: Int, column: Int): Boolean = true
 }

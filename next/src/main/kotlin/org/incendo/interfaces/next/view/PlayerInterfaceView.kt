@@ -23,10 +23,6 @@ public class PlayerInterfaceView internal constructor(
         error("PlayerInventoryView's cannot have a title")
     }
 
-    override fun overlapsPlayerInventory(): Boolean = true
-
-    override fun requiresNewInventory(): Boolean = false
-
     override fun createInventory(): PlayerInterfacesInventory = PlayerInterfacesInventory(player)
 
     override fun openInventory() {
@@ -37,6 +33,20 @@ public class PlayerInterfaceView internal constructor(
             InterfacesListeners.INSTANCE.setOpenInterface(player.uniqueId, null)
             player.closeInventory()
             InterfacesListeners.INSTANCE.setOpenInterface(player.uniqueId, this)
+        }
+
+        // Double-check that this inventory is open now!
+        if (isOpen(player)) {
+            // Clear the player's inventory!
+            player.inventory.clear()
+            if (player.openInventory.topInventory.type == InventoryType.CRAFTING) {
+                player.openInventory.topInventory.clear()
+            }
+            player.openInventory.cursor = null
+
+            // Trigger onOpen manually because there is no real inventory being opened,
+            // this will also re-draw the player inventory parts!
+            onOpen()
         }
     }
 

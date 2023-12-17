@@ -5,6 +5,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
 import java.lang.reflect.Method;
+import java.util.Objects;
 import java.util.UUID;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -76,7 +77,17 @@ public class PaperInterfaceListeners implements Listener {
             "PLAYER", "UNKNOWN", "PLUGIN"
     );
 
-    private final @NonNull Plugin plugin;
+    private static Plugin targetPlugin;
+
+    /**
+     * Reference to plugin using Interfaces
+     *
+     * @return plugin reference
+     */
+    public static Plugin plugin() {
+        return targetPlugin;
+    }
+
     private final @NonNull Map<@NonNull SelfUpdatingInterfaceView, @NonNull Integer> updatingRunnables;
 
     private final @Nullable Cache<UUID, Long> spamPrevention;
@@ -87,7 +98,7 @@ public class PaperInterfaceListeners implements Listener {
      * @param plugin the plugin instance to register against
      */
     public PaperInterfaceListeners(final @NonNull Plugin plugin) {
-        this.plugin = plugin;
+        targetPlugin = plugin;
         this.updatingRunnables = new ConcurrentHashMap<>();
         this.spamPrevention = null;
     }
@@ -99,7 +110,7 @@ public class PaperInterfaceListeners implements Listener {
      * @param clickThrottle the minimum amount of ticks between every accepted click
      */
     public PaperInterfaceListeners(final @NonNull Plugin plugin, final long clickThrottle) {
-        this.plugin = plugin;
+        targetPlugin = plugin;
         this.updatingRunnables = new ConcurrentHashMap<>();
         this.spamPrevention = CacheBuilder.newBuilder().expireAfterWrite(
                 50L * clickThrottle,
@@ -123,7 +134,7 @@ public class PaperInterfaceListeners implements Listener {
      */
     @EventHandler
     public void onDisable(final @NonNull PluginDisableEvent event) {
-        if (event.getPlugin() != this.plugin) {
+        if (event.getPlugin() != targetPlugin) {
             return;
         }
 
@@ -184,10 +195,10 @@ public class PaperInterfaceListeners implements Listener {
 
                 if (view instanceof SelfUpdatingInterfaceView) {
                     SelfUpdatingInterfaceView selfUpdating = (SelfUpdatingInterfaceView) view;
-                    runnable.runTaskTimerAsynchronously(this.plugin, updatingInterface.updateDelay(), updatingInterface.updateDelay());
+                    runnable.runTaskTimerAsynchronously(targetPlugin, updatingInterface.updateDelay(), updatingInterface.updateDelay());
                     this.updatingRunnables.put(selfUpdating, runnable.getTaskId());
                 } else {
-                    runnable.runTaskLaterAsynchronously(this.plugin, updatingInterface.updateDelay());
+                    runnable.runTaskLaterAsynchronously(targetPlugin, updatingInterface.updateDelay());
                 }
             }
         }
@@ -250,8 +261,13 @@ public class PaperInterfaceListeners implements Listener {
                 }
             }
             if (playerInventoryView != null && VALID_REASON.contains(reason)) {
+                Plugin plugin = Objects.requireNonNullElseGet(
+                        PaperInterfaceListeners.plugin(),
+                        () -> JavaPlugin.getProvidingPlugin(this.getClass())
+                );
+
                 Bukkit.getScheduler().runTaskAsynchronously(
-                        JavaPlugin.getProvidingPlugin(this.getClass()),
+                        plugin,
                         playerInventoryView::open
                 );
             }
@@ -423,8 +439,15 @@ public class PaperInterfaceListeners implements Listener {
     }
 
     private void handleChestViewClick(final @NonNull InventoryClickEvent event, final @NonNull InventoryHolder holder) {
+        ChestView chestView = (ChestView) holder;
+
         if (event.getSlot() != event.getRawSlot()) {
-            this.handlePlayerViewClick(event);
+            if (chestView.backing().cancelClicksInPlayerInventory()) {
+                event.setCancelled(true);
+            } else {
+                this.handlePlayerViewClick(event);
+            }
+
             return;
         }
 
@@ -434,21 +457,20 @@ public class PaperInterfaceListeners implements Listener {
                 false
         );
 
-        ChestView chestView = (ChestView) holder;
-
         // Handle element click event
-        if (event.getSlotType() == InventoryType.SlotType.CONTAINER) {
-            int slot = event.getSlot();
-            int x = slot % 9;
-            int y = slot / 9;
-            ChestPane pane = chestView.pane();
+        if (event.getSlotType() != InventoryType.SlotType.CONTAINER) {
+            return;
+        }
 
-            if (y < pane.rows()) {
-                // Handle parent interface click event
-                chestView.backing().clickHandler().accept(context);
+        int slot = event.getSlot();
+        int x = slot % 9;
+        int y = slot / 9;
+        ChestPane pane = chestView.pane();
 
-                pane.element(x, y).clickHandler().accept(context);
-            }
+        if (y < pane.rows()) {
+            // Handle parent interface click event
+            chestView.backing().clickHandler().accept(context);
+            pane.element(x, y).clickHandler().accept(context);
         }
     }
 
